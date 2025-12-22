@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visiting Card with Image Upload</title>
+  <style>
+    /* General styling */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      background-color: #f4f4f9;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Card styling */
+    .card {
+      width: 90%; /* Responsive width for mobile */
+      max-width: 400px; /* Max width */
+      height: 200px; /* Increased height for address */
+      background: #0073e6;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 15px;
+      box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+      margin-top: 20px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .profile-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);
+      position: absolute;
+      top: 45px;
+      right: 15px;
+    }
+
+    .card h2 {
+      margin: 0 0 5px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .card h4 {
+      margin: 5px 0;
+      font-size: 14px;
+      font-weight: normal;
+    }
+
+    .card p {
+      font-size: 12px;
+      margin: 5px 0;
+      line-height: 1.2;
+    }
+
+    .contact-info {
+      margin-top: 5px;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .address {
+      font-size: 12px;
+      margin-top: 8px;
+    }
+
+    /* Button styling */
+    .button {
+      margin-top: 10px;
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .button:hover {
+      background-color: #45a049;
+    }
+
+    .yellow-button {
+      background-color: #FFD700; /* Gold color */
+      color: black;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .yellow-button:hover {
+      background-color: #FFC300; /* Lighter gold on hover */
+    }
+
+    /* Highlight styling */
+    .highlighted-description {
+      background-color: black;
+      color: white;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+  <!-- Upload Section -->
+  <div class="upload-section">
+    <h3>Upload Your Photo</h3>
+    <input type="file" accept="image/*" id="imageUpload" onchange="previewImage(event)">
+    <button class="button" id="saveButton" style="display: none;" onclick="saveImage()">Save Profile Image</button>
+  </div>
+
+  <!-- Color Selection Section -->
+  <div class="color-selection">
+    <h3>Change Colors</h3>
+    <button class="yellow-button" onclick="setTextColorToYellow()">Set Text Color to Yellow</button><br>
+    <button class="yellow-button" onclick="highlightRole()">Highlight Role with Green Background</button><br> 
+    <button class="yellow-button" onclick="highlightDescription()">Highlight Description with Black Background</button><br>
+
+    <h4>Background Color:</h4>
+    <label>
+      <input type="radio" name="bgColor" value="red" onchange="changeBackgroundColor(event)"> Red
+    </label><br>
+    <label>
+      <input type="radio" name="bgColor" value="blue" onchange="changeBackgroundColor(event)"> Blue
+    </label><br>
+    <label>
+      <input type="radio" name="bgColor" value="black" onchange="changeBackgroundColor(event)"> Black
+    </label>
+  </div>
+
+  <!-- Card Section -->
+  <div class="card" id="visitingCard">
+    <!-- Phone number positioned in upper right corner -->
+    <span id="phone" style="font-size: 12px; position: absolute; top: 10px; right: 10px;">📱 +91 8329912335</span>
+
+    <h2 id="name">Vedprakash.S.Dubey</h2>
+    <br><br>
+    <h2 id="role">Graphic Designer</h2>
+    <Br><br>
+    
+    <!-- Description Section -->
+    <p id="description">Designing Attractive, User-Friendly Visiting Cards.</p>
+
+    <!-- Profile Image Above Phone Number -->
+    <img src="https://via.placeholder.com/100" alt="Profile Picture" class="profile-img" id="profileImage">
+<Br>
+    <!-- Contact Information at the bottom -->
+    <div class="contact-info">
+      <span>📧 <span id="email">dubey281@gmail.com</span></span>
+ </div>
+  </div>
+
+
+
+  <!-- Save Visiting Card Button -->
+  <button class="button" onclick="saveVisitingCard()">Save Visiting Card</button>
+
+  <script>
+    let imageUrl = '';
+
+    function previewImage(event) {
+      const imgElement = document.getElementById('profileImage');
+      imageUrl = URL.createObjectURL(event.target.files[0]);
+      imgElement.src = imageUrl;
+      document.getElementById('saveButton').style.display = 'block';
+    }
+
+    function saveImage() {
+      const link = document.createElement('a');
+      link.href = imageUrl;
+      link.download = 'profile_picture.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    function saveVisitingCard() {
+      const cardElement = document.getElementById('visitingCard');
+      
+      html2canvas(cardElement).then(canvas => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'visiting_card.png';
+        link.click();
+      });
+    }
+
+    function setTextColorToYellow() {
+      const card = document.getElementById('visitingCard');
+      card.style.color = 'yellow'; // Set the text color of the whole card to yellow
+
+      // Also set the description color to yellow
+      const descriptionElement = document.getElementById('description');
+      descriptionElement.style.color = 'yellow'; // Change the description color to yellow
+    }
+
+    function highlightRole() {
+      const roleElement = document.getElementById('role');
+      roleElement.style.backgroundColor = 'green'; // Highlight the role background with green color
+      roleElement.style.color = 'white'; // Set the text color to white for contrast
+      roleElement.style.padding = '2px 4px'; // Add padding to make the background more visible
+      roleElement.style.borderRadius = '4px'; // Round the background edges
+    }
+
+    function highlightDescription() {
+      const descriptionElement = document.getElementById('description');
+      descriptionElement.style.backgroundColor = 'black'; // Set black background
+      descriptionElement.style.color = 'white'; // Set text color to white
+      descriptionElement.style.padding = '2px 4px'; // Add padding
+      descriptionElement.style.borderRadius = '4px'; // Round the background edges
+    }
+
+    function changeBackgroundColor(event) {
+      const color = event.target.value;
+      const card = document.getElementById('visitingCard');
+      card.style.backgroundColor = color; // Change the background color of the card
+    }
+  </script>
+</body>
+</html>
