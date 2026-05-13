@@ -129,15 +129,9 @@
     <button class="yellow-button" onclick="highlightDescription()">Highlight Description with Black Background</button><br>
 
     <h4>Background Color:</h4>
-    <label>
-      <input type="radio" name="bgColor" value="red" onchange="changeBackgroundColor(event)"> Red
-    </label><br>
-    <label>
-      <input type="radio" name="bgColor" value="blue" onchange="changeBackgroundColor(event)"> Blue
-    </label><br>
-    <label>
-      <input type="radio" name="bgColor" value="black" onchange="changeBackgroundColor(event)"> Black
-    </label>
+    <label><input type="radio" name="bgColor" value="red" onchange="changeBackgroundColor(event)"> Red</label><br>
+    <label><input type="radio" name="bgColor" value="blue" onchange="changeBackgroundColor(event)"> Blue</label><br>
+    <label><input type="radio" name="bgColor" value="black" onchange="changeBackgroundColor(event)"> Black</label>
   </div>
 
   <!-- Card Section -->
@@ -182,7 +176,7 @@
         document.getElementById('saveButton').style.display = 'block';
       };
 
-      imgElement.src = imageUrl + '?t=' + new Date().getTime();
+      imgElement.src = imageUrl;
     }
 
     function saveImage() {
@@ -190,36 +184,37 @@
 
       const link = document.createElement('a');
       link.href = imageUrl;
-      link.download = 'profile_picture.png';
+      link.download = `profile_picture_${Date.now()}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
-    async function generateLatestCardCanvas() {
+    async function getFreshCanvas() {
       const cardElement = document.getElementById('visitingCard');
 
       return await html2canvas(cardElement, {
         useCORS: true,
         allowTaint: true,
+        backgroundColor: null,
         scale: 2,
-        logging: false
+        removeContainer: true
       });
     }
 
     async function saveVisitingCard() {
-      const canvas = await generateLatestCardCanvas();
+      const canvas = await getFreshCanvas();
 
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
-      link.download = 'Visiting_Card.png';
+      link.download = `Visiting_Card_${Date.now()}.png`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
 
     async function saveVisitingCardPDF() {
-      const canvas = await generateLatestCardCanvas();
+      const canvas = await getFreshCanvas();
 
       const imgData = canvas.toDataURL('image/png');
 
@@ -239,7 +234,7 @@
       const yPosition = (pageHeight - imgHeight) / 2;
 
       pdf.addImage(imgData, 'PNG', 0, yPosition, imgWidth, imgHeight);
-      pdf.save('Visiting_Card.pdf');
+      pdf.save(`Visiting_Card_${Date.now()}.pdf`);
     }
 
     function setTextColorToYellow() {
