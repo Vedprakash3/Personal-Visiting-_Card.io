@@ -178,11 +178,11 @@
 
       imageUrl = URL.createObjectURL(file);
 
-      imgElement.onload = function() {
+      imgElement.onload = function () {
         document.getElementById('saveButton').style.display = 'block';
       };
 
-      imgElement.src = imageUrl;
+      imgElement.src = imageUrl + '?t=' + new Date().getTime();
     }
 
     function saveImage() {
@@ -196,55 +196,50 @@
       document.body.removeChild(link);
     }
 
-    function saveVisitingCard() {
+    async function generateLatestCardCanvas() {
       const cardElement = document.getElementById('visitingCard');
 
-      setTimeout(() => {
-        html2canvas(cardElement, {
-          useCORS: true,
-          allowTaint: true,
-          scale: 2,
-          logging: false
-        }).then(canvas => {
-          const link = document.createElement('a');
-          link.href = canvas.toDataURL('image/png');
-          link.download = 'Visiting_Card.png';
-          link.click();
-        });
-      }, 300);
+      return await html2canvas(cardElement, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 2,
+        logging: false
+      });
     }
 
-    function saveVisitingCardPDF() {
-      const cardElement = document.getElementById('visitingCard');
+    async function saveVisitingCard() {
+      const canvas = await generateLatestCardCanvas();
 
-      setTimeout(() => {
-        html2canvas(cardElement, {
-          useCORS: true,
-          allowTaint: true,
-          scale: 2,
-          logging: false
-        }).then(canvas => {
-          const imgData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'Visiting_Card.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
 
-          const { jsPDF } = window.jspdf;
-          const pdf = new jsPDF({
-            orientation: 'landscape',
-            unit: 'mm',
-            format: 'a4'
-          });
+    async function saveVisitingCardPDF() {
+      const canvas = await generateLatestCardCanvas();
 
-          const pageWidth = pdf.internal.pageSize.getWidth();
-          const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgData = canvas.toDataURL('image/png');
 
-          const imgWidth = pageWidth;
-          const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+      });
 
-          const yPosition = (pageHeight - imgHeight) / 2;
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
 
-          pdf.addImage(imgData, 'PNG', 0, yPosition, imgWidth, imgHeight);
-          pdf.save('Visiting_Card.pdf');
-        });
-      }, 300);
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      const yPosition = (pageHeight - imgHeight) / 2;
+
+      pdf.addImage(imgData, 'PNG', 0, yPosition, imgWidth, imgHeight);
+      pdf.save('Visiting_Card.pdf');
     }
 
     function setTextColorToYellow() {
