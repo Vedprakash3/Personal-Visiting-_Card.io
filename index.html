@@ -115,6 +115,7 @@
     }
   </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -166,10 +167,11 @@
  </div>
   </div>
 
-
-
   <!-- Save Visiting Card Button -->
   <button class="button" onclick="saveVisitingCard()">Save Visiting Card</button>
+
+  <!-- Save PDF Button -->
+  <button class="button" onclick="saveVisitingCardPDF()">Save Visiting Card as PDF</button>
 
   <script>
     let imageUrl = '';
@@ -190,6 +192,7 @@
       document.body.removeChild(link);
     }
 
+    /* ORIGINAL PNG DOWNLOAD FUNCTION UNCHANGED */
     function saveVisitingCard() {
       const cardElement = document.getElementById('visitingCard');
       
@@ -201,35 +204,64 @@
       });
     }
 
+    /* NEW PDF FUNCTION */
+    function saveVisitingCardPDF() {
+      const cardElement = document.getElementById('visitingCard');
+      
+      html2canvas(cardElement, {
+        useCORS: true,
+        allowTaint: true
+      }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: 'a4'
+        });
+
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        const yPosition = (pageHeight - imgHeight) / 2;
+
+        pdf.addImage(imgData, 'PNG', 0, yPosition, imgWidth, imgHeight);
+        pdf.save('Visiting_Card.pdf');
+      });
+    }
+
     function setTextColorToYellow() {
       const card = document.getElementById('visitingCard');
-      card.style.color = 'yellow'; // Set the text color of the whole card to yellow
+      card.style.color = 'yellow';
 
-      // Also set the description color to yellow
       const descriptionElement = document.getElementById('description');
-      descriptionElement.style.color = 'yellow'; // Change the description color to yellow
+      descriptionElement.style.color = 'yellow';
     }
 
     function highlightRole() {
       const roleElement = document.getElementById('role');
-      roleElement.style.backgroundColor = 'green'; // Highlight the role background with green color
-      roleElement.style.color = 'white'; // Set the text color to white for contrast
-      roleElement.style.padding = '2px 4px'; // Add padding to make the background more visible
-      roleElement.style.borderRadius = '4px'; // Round the background edges
+      roleElement.style.backgroundColor = 'green';
+      roleElement.style.color = 'white';
+      roleElement.style.padding = '2px 4px';
+      roleElement.style.borderRadius = '4px';
     }
 
     function highlightDescription() {
       const descriptionElement = document.getElementById('description');
-      descriptionElement.style.backgroundColor = 'black'; // Set black background
-      descriptionElement.style.color = 'white'; // Set text color to white
-      descriptionElement.style.padding = '2px 4px'; // Add padding
-      descriptionElement.style.borderRadius = '4px'; // Round the background edges
+      descriptionElement.style.backgroundColor = 'black';
+      descriptionElement.style.color = 'white';
+      descriptionElement.style.padding = '2px 4px';
+      descriptionElement.style.borderRadius = '4px';
     }
 
     function changeBackgroundColor(event) {
       const color = event.target.value;
       const card = document.getElementById('visitingCard');
-      card.style.backgroundColor = color; // Change the background color of the card
+      card.style.backgroundColor = color;
     }
   </script>
 </body>
